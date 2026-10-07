@@ -58,7 +58,7 @@ export default function ContentRow({ title, items }: { title: string; items: Med
           aria-label={`Scroll ${title} left`}
           onClick={() => scrollRail("left")}
           disabled={!canScrollLeft}
-          className="motion-lift absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full border border-white/15 bg-black/45 p-2 text-bone shadow-lg backdrop-blur-sm transition hover:bg-black/70 disabled:pointer-events-none disabled:opacity-0 md:left-4"
+          className="motion-lift absolute left-2 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-black/45 p-2 text-bone shadow-lg backdrop-blur-sm transition hover:bg-black/70 disabled:pointer-events-none disabled:opacity-0 md:left-4 md:grid"
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="m15 18-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
@@ -72,7 +72,7 @@ export default function ContentRow({ title, items }: { title: string; items: Med
           aria-label={`Scroll ${title} right`}
           onClick={() => scrollRail("right")}
           disabled={!canScrollRight}
-          className="motion-lift absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full border border-white/15 bg-black/45 p-2 text-bone shadow-lg backdrop-blur-sm transition hover:bg-black/70 disabled:pointer-events-none disabled:opacity-0 md:right-4"
+          className="motion-lift absolute right-2 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-black/45 p-2 text-bone shadow-lg backdrop-blur-sm transition hover:bg-black/70 disabled:pointer-events-none disabled:opacity-0 md:right-4 md:grid"
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="m9 18 6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />

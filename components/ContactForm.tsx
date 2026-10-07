@@ -31,12 +31,12 @@ export default function ContactForm() {
     }
   }
   return <form onSubmit={submit} className="mt-8 space-y-5 rounded-2xl border border-white/10 bg-panel/70 p-6">
-    <label className="block text-sm font-semibold">Name<input name="name" required maxLength={100} className="mt-2 w-full rounded-lg border border-white/10 bg-ink px-4 py-3 outline-none focus:border-ember" /></label>
-    <label className="block text-sm font-semibold">Email<input name="email" type="email" required maxLength={254} className="mt-2 w-full rounded-lg border border-white/10 bg-ink px-4 py-3 outline-none focus:border-ember" /></label>
-    <label className="block text-sm font-semibold">Subject<input name="subject" required maxLength={160} className="mt-2 w-full rounded-lg border border-white/10 bg-ink px-4 py-3 outline-none focus:border-ember" /></label>
-    <label className="block text-sm font-semibold">Message<textarea name="message" required maxLength={4000} rows={6} className="mt-2 w-full rounded-lg border border-white/10 bg-ink px-4 py-3 outline-none focus:border-ember" /></label>
+    <label className="block text-sm font-semibold">Name<input name="name" required maxLength={100} className="mt-2 min-h-11 w-full rounded-lg border border-white/10 bg-ink px-4 py-3 text-base outline-none focus:border-ember" /></label>
+    <label className="block text-sm font-semibold">Email<input name="email" type="email" required maxLength={254} className="mt-2 min-h-11 w-full rounded-lg border border-white/10 bg-ink px-4 py-3 text-base outline-none focus:border-ember" /></label>
+    <label className="block text-sm font-semibold">Subject<input name="subject" required maxLength={160} className="mt-2 min-h-11 w-full rounded-lg border border-white/10 bg-ink px-4 py-3 text-base outline-none focus:border-ember" /></label>
+    <label className="block text-sm font-semibold">Message<textarea name="message" required maxLength={4000} rows={6} className="mt-2 w-full resize-y rounded-lg border border-white/10 bg-ink px-4 py-3 text-base outline-none focus:border-ember" /></label>
     <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
-    <button disabled={busy} className="rounded-lg bg-ember px-6 py-3 font-bold text-ink disabled:opacity-60">{busy ? "Sending..." : "Send message"}</button>
+    <button disabled={busy} className="min-h-11 rounded-lg bg-ember px-6 py-3 font-bold text-ink disabled:opacity-60">{busy ? "Sending..." : "Send message"}</button>
     {status && <p role="status" className="text-sm text-mute">{status}</p>}
   </form>;
 }

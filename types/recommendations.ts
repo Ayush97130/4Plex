@@ -15,6 +15,10 @@ export interface RecommendationEvent {
   durationSeconds?: number;
   completionPercentage?: number;
   completed?: boolean;
+  season?: number;
+  episode?: number;
+  poster?: string | null;
+  backdrop?: string | null;
   timezone: string;
   period: WatchPeriod;
 }

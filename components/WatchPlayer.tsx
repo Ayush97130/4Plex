@@ -2,10 +2,25 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { recordEvent } from "@/lib/recommendations";
+import { createClient } from "@/lib/supabase/client";
+import { readEvents, recordEvent } from "@/lib/recommendations";
+import { CONTINUE_WATCHING_UPDATED, continueWatchingFromEvents } from "@/lib/continueWatching";
 import type { MediaType } from "@/types/media";
 
-export default function WatchPlayer({ src, contentId, contentType, genreIds, title, nextEpisodeUrl }: { src: string; contentId: number; contentType: MediaType; genreIds: number[]; title: string; nextEpisodeUrl?: string }) {
+type WatchPlayerProps = {
+  src: string;
+  contentId: number;
+  contentType: MediaType;
+  genreIds: number[];
+  title: string;
+  poster?: string | null;
+  backdrop?: string | null;
+  season?: number;
+  episode?: number;
+  nextEpisodeUrl?: string;
+};
+
+export default function WatchPlayer({ src, contentId, contentType, genreIds, title, poster, backdrop, season, episode, nextEpisodeUrl }: WatchPlayerProps) {
   const playerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -13,6 +28,23 @@ export default function WatchPlayer({ src, contentId, contentType, genreIds, tit
   const [error, setError] = useState<string | null>(null);
   const [showNextEpisode, setShowNextEpisode] = useState(false);
   const lastProgressRef = useRef(0);
+
+  const syncAccountProgress = async () => {
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const entries = continueWatchingFromEvents(readEvents()).slice(0, 20).map((item) => ({
+        contentId: item.contentId, contentType: item.contentType, title: item.title, poster: item.poster,
+        backdrop: item.backdrop, progress: item.progress, durationSeconds: item.durationSeconds,
+        watchedAt: item.watchedAt, season: item.season, episode: item.episode,
+      }));
+      const { error: updateError } = await supabase.auth.updateUser({ data: { continue_watching: entries } });
+      if (updateError) console.warn("Unable to sync continue watching progress.", updateError.message);
+    } catch (syncError) {
+      console.warn("Unable to sync continue watching progress.", syncError);
+    }
+  };
 
   useEffect(() => {
     const handleFullscreenChange = () => setIsFullscreen(document.fullscreenElement === playerRef.current);
@@ -35,7 +67,7 @@ export default function WatchPlayer({ src, contentId, contentType, genreIds, tit
           throw new Error("Playback source was not returned.");
         }
         setPlayerSrc(data.url);
-        recordEvent({ type: "watch_start", contentId, contentType, genreIds, title });
+        recordEvent({ type: "watch_start", contentId, contentType, genreIds, title, poster, backdrop, season, episode });
       })
       .catch((reason: unknown) => {
         if (reason instanceof DOMException && reason.name === "AbortError") return;
@@ -46,8 +78,6 @@ export default function WatchPlayer({ src, contentId, contentType, genreIds, tit
   }, [src, contentId, contentType, genreIds, title]);
 
   useEffect(() => {
-    if (!nextEpisodeUrl) return;
-
     const handlePlayerMessage = (event: MessageEvent<unknown>) => {
       if (event.source !== iframeRef.current?.contentWindow) return;
 
@@ -82,8 +112,14 @@ export default function WatchPlayer({ src, contentId, contentType, genreIds, tit
           durationSeconds: currentTime,
           completionPercentage,
           completed: eventName === "ended" || completionPercentage >= 98,
+          poster,
+          backdrop,
+          season,
+          episode,
         });
         lastProgressRef.current = currentTime;
+        window.dispatchEvent(new Event(CONTINUE_WATCHING_UPDATED));
+        void syncAccountProgress();
       }
 
       if (eventName === "ended" || (remaining !== undefined && remaining <= 60 && remaining >= 0)) {
@@ -93,7 +129,7 @@ export default function WatchPlayer({ src, contentId, contentType, genreIds, tit
 
     window.addEventListener("message", handlePlayerMessage);
     return () => window.removeEventListener("message", handlePlayerMessage);
-  }, [nextEpisodeUrl, contentId, contentType, genreIds, title]);
+  }, [nextEpisodeUrl, contentId, contentType, genreIds, title, poster, backdrop, season, episode]);
 
   const toggleFullscreen = async () => {
     if (!playerRef.current) return;
@@ -143,7 +179,7 @@ export default function WatchPlayer({ src, contentId, contentType, genreIds, tit
         onClick={toggleFullscreen}
         aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
         title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-        className="absolute bottom-3 right-3 z-10 rounded-md border border-white/20 bg-black/60 p-2 text-white opacity-0 shadow-lg backdrop-blur-sm transition-opacity hover:bg-black/80 group-hover:opacity-100 focus-visible:opacity-100"
+        className="absolute bottom-3 right-3 z-10 grid h-11 w-11 place-items-center rounded-md border border-white/20 bg-black/60 p-2 text-white opacity-100 shadow-lg backdrop-blur-sm transition-opacity hover:bg-black/80 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100"
       >
         {isFullscreen ? (
           <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">

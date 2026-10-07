@@ -2,6 +2,7 @@ import { tmdbService } from "@/services/tmdbService";
 import HeroBanner from "@/components/HeroBanner";
 import ContentRow from "@/components/ContentRow";
 import PersonalizedRecommendations from "@/components/PersonalizedRecommendations";
+import ContinueWatching from "@/components/ContinueWatching";
 import { uniqueMedia } from "@/lib/recommendations";
 
 export const revalidate = 3600;
@@ -30,6 +31,7 @@ export default async function Home() {
     <>
       <HeroBanner items={hero} />
       <div className="relative z-10 -mt-10">
+        <ContinueWatching />
         <PersonalizedRecommendations candidates={[...trending, ...pm, ...ptv, ...topM, ...recent, ...genreRows.flat()]} />
         <ContentRow title="Trending Now" items={trending} />
         <ContentRow title="Popular Movies" items={pm} />

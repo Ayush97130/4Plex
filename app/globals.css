@@ -1,6 +1,7 @@
 @tailwind base; @tailwind components; @tailwind utilities;
 :root { color-scheme: dark; }
 html { scroll-behavior: smooth; }
+html, body { max-width: 100%; }
 body {
   @apply bg-ink text-bone antialiased;
   background-image:
@@ -55,7 +56,7 @@ main { animation: page-enter .12s ease-out both; }
   to { opacity: 1; transform: translateY(0); }
 }
 :focus-visible { outline: 2px solid #E9A23B; outline-offset: 3px; border-radius: 6px; }
-.rail { scrollbar-width: none; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+.rail { scrollbar-width: none; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; overscroll-behavior-inline: contain; }
 .rail::-webkit-scrollbar { display: none; }
 .rail > * { scroll-snap-align: start; }
 .rail-fade::before, .rail-fade::after {
@@ -98,4 +99,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 @media (max-width: 640px) {
   .ambient-art { filter: blur(48px) saturate(.52); opacity: .13; }
+  .rail { scroll-padding-inline: 1rem; }
+  .motion-lift:hover { transform: none; filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rail { scroll-behavior: auto; }
 }

@@ -30,7 +30,7 @@ export default function EpisodeList({
           <select
             value={currentSeason}
             onChange={(event) => router.push(`/watch/tv/${id}?s=${event.target.value}&e=1`)}
-            className="rounded-lg border border-white/15 bg-raised px-3 py-2 text-bone outline-none focus:border-ember"
+            className="min-h-11 rounded-lg border border-white/15 bg-raised px-3 py-2 text-bone outline-none focus:border-ember"
           >
             {Array.from({ length: seasons }, (_, index) => {
               const season = index + 1;
@@ -52,7 +52,7 @@ export default function EpisodeList({
               <span className="w-5 shrink-0 self-center text-center text-lg font-semibold text-mute">{episode.number}</span>
               <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-lg bg-raised md:h-24 md:w-40">
                 {episode.still ? (
-                  <Image src={`https://image.tmdb.org/t/p/w300${episode.still}`} alt="" fill sizes="160px" className="object-cover" />
+                  <Image src={`https://image.tmdb.org/t/p/w300${episode.still}`} alt="" fill sizes="(max-width: 767px) 128px, 160px" quality={70} className="object-cover" />
                 ) : (
                   <div className="grid h-full place-items-center text-xs text-mute">No image</div>
                 )}

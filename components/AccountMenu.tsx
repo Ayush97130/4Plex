@@ -11,6 +11,7 @@ export default function AccountMenu() {
   const pathname = usePathname();
   const [profile, setProfile] = useState<AccountProfile>(DEFAULT_ACCOUNT_PROFILE);
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (pathname === "/auth") return;
@@ -21,9 +22,10 @@ export default function AccountMenu() {
     try {
       supabase = createClient();
     } catch {
+      setLoading(false);
       return () => window.removeEventListener("4plex:account-updated", refresh);
     }
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    supabase.auth.getUser().then(({ data }) => setUser(data.user)).finally(() => setLoading(false));
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => setUser(session?.user ?? null));
     return () => {
         window.removeEventListener("4plex:account-updated", refresh);
@@ -32,6 +34,10 @@ export default function AccountMenu() {
   }, [pathname]);
 
   if (pathname === "/auth") return null;
+  if (loading) return <div className="h-9 w-9" aria-hidden="true" />;
+  if (!user) {
+    return <Link href={`/auth?next=${encodeURIComponent(pathname)}`} className="inline-flex min-h-11 items-center rounded-full border border-white/15 bg-white/[.04] px-4 text-sm font-bold text-bone transition hover:border-ember/60 hover:text-ember">Sign in</Link>;
+  }
 
   const displayName = profile.displayName !== DEFAULT_ACCOUNT_PROFILE.displayName
     ? profile.displayName
@@ -42,10 +48,10 @@ export default function AccountMenu() {
 
   return (
     <div className="flex items-center gap-2">
-        <Link href="/profile" aria-label={`Open profile for ${displayName}`} title={user?.email ?? displayName} className="grid h-9 w-9 place-items-center rounded-full font-bold text-ink shadow-lg transition-transform hover:scale-105" style={{ backgroundColor: profile.accent }}>
+        <Link href="/profile" aria-label={`Open profile for ${displayName}`} title={user.email ?? displayName} className="grid h-11 w-11 place-items-center rounded-full font-bold text-ink shadow-lg transition-transform hover:scale-105" style={{ backgroundColor: profile.accent }}>
             {avatar.slice(0, 2)}
         </Link>
-        <button type="button" onClick={async () => { try { await createClient().auth.signOut({ scope: "local" }); } finally { window.location.assign("/auth"); } }} className="hidden rounded-full border border-white/15 bg-white/[.04] px-4 py-2 text-sm font-bold text-bone transition hover:border-ember/60 hover:text-ember sm:block">
+        <button type="button" onClick={async () => { try { await createClient().auth.signOut({ scope: "local" }); } finally { window.location.assign("/"); } }} className="hidden min-h-11 rounded-full border border-white/15 bg-white/[.04] px-4 py-2 text-sm font-bold text-bone transition hover:border-ember/60 hover:text-ember sm:block">
           Sign out
         </button>
     </div>

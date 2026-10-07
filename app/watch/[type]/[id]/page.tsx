@@ -39,8 +39,8 @@ export default async function Watch({
 
   return (
     <section className="mx-auto w-full max-w-7xl px-4 pt-24 md:px-10">
-      <div className="mb-5 flex items-center justify-between gap-4">
-        <Link href={`/title/${type}/${id}`} className="text-sm font-semibold text-mute hover:text-bone">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-2">
+        <Link href={`/title/${type}/${id}`} className="inline-flex min-h-11 items-center text-sm font-semibold text-mute hover:text-bone">
           ← Back to details
         </Link>
         {type === "tv" && (
@@ -49,7 +49,7 @@ export default async function Watch({
           </p>
         )}
       </div>
-      <WatchPlayer src={`/api/stream?${playbackUrl.toString()}`} contentId={id} contentType={type} genreIds={detail.genreIds} title={detail.title} nextEpisodeUrl={nextEpisodeUrl} />
+      <WatchPlayer src={`/api/stream?${playbackUrl.toString()}`} contentId={id} contentType={type} genreIds={detail.genreIds} title={detail.title} poster={detail.poster} backdrop={detail.backdrop} season={type === "tv" ? currentSeason : undefined} episode={type === "tv" ? currentEpisode : undefined} nextEpisodeUrl={nextEpisodeUrl} />
       <p className="mt-4 text-sm text-mute">
         Playback is provided by NexStream. If the player does not load, verify that your API key is valid and domain-locked for this site.
       </p>

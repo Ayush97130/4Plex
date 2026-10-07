@@ -65,12 +65,12 @@ export default function AuthForm({ nextPath, configError, oauthError, oauthMessa
   }
 
   return (
-    <main className="grid min-h-screen place-items-center px-4 py-24">
+    <div className="grid min-h-[calc(100vh-4.5rem)] place-items-center px-4 py-10 md:py-24">
       <section className="w-full max-w-md rounded-3xl border border-white/10 bg-panel/90 p-7 shadow-2xl shadow-black/40">
         <Link href="/" className="text-sm font-bold text-ember">← Back to 4PLEX</Link>
         <p className="mt-8 text-xs font-bold uppercase tracking-[.25em] text-ember">Members only</p>
-        <h1 className="mt-2 text-3xl font-extrabold">{mode === "login" ? "Welcome back" : "Create your account"}</h1>
-        <p className="mt-2 text-sm text-mute">Sign in with your email and password to access 4PLEX.</p>
+        <h1 className="mt-2 text-3xl font-extrabold">{nextPath ? "Sign in to continue" : mode === "login" ? "Welcome back" : "Create your account"}</h1>
+        <p className="mt-2 text-sm text-mute">{nextPath ? "Create an account or sign in to save movies, manage your list, and personalize 4PLEX." : "Sign in with your email and password to access 4PLEX."}</p>
         <button type="button" onClick={signInWithGoogle} disabled={loading} className="mt-7 flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-white font-bold text-slate-900 transition hover:bg-white/90 disabled:cursor-wait disabled:opacity-60">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M21.35 12.27c0-.79-.07-1.55-.22-2.27H12v4.3h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.69 2.91-4.18 2.91-7.42Z" />
@@ -82,9 +82,9 @@ export default function AuthForm({ nextPath, configError, oauthError, oauthMessa
         </button>
         <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-[.2em] text-mute"><span className="h-px flex-1 bg-white/10" />or<span className="h-px flex-1 bg-white/10" /></div>
         <form onSubmit={submit} className="space-y-4">
-          {mode === "register" && <label className="block text-sm font-semibold">Display name<input required value={name} onChange={(event) => setName(event.target.value)} className="mt-2 block w-full rounded-xl border border-white/10 bg-raised px-4 py-3 text-bone" maxLength={40} /></label>}
-          <label className="block text-sm font-semibold">Email<input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2 block w-full rounded-xl border border-white/10 bg-raised px-4 py-3 text-bone" /></label>
-          <label className="block text-sm font-semibold">Password<input required type="password" minLength={6} autoComplete={mode === "login" ? "current-password" : "new-password"} value={password} onChange={(event) => setPassword(event.target.value)} className="mt-2 block w-full rounded-xl border border-white/10 bg-raised px-4 py-3 text-bone" /></label>
+          {mode === "register" && <label className="block text-sm font-semibold">Display name<input required value={name} onChange={(event) => setName(event.target.value)} className="mt-2 block min-h-11 w-full rounded-xl border border-white/10 bg-raised px-4 py-3 text-base text-bone" maxLength={40} /></label>}
+          <label className="block text-sm font-semibold">Email<input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2 block min-h-11 w-full rounded-xl border border-white/10 bg-raised px-4 py-3 text-base text-bone" /></label>
+          <label className="block text-sm font-semibold">Password<input required type="password" minLength={6} autoComplete={mode === "login" ? "current-password" : "new-password"} value={password} onChange={(event) => setPassword(event.target.value)} className="mt-2 block min-h-11 w-full rounded-xl border border-white/10 bg-raised px-4 py-3 text-base text-bone" /></label>
           {error && <p role="alert" className="rounded-xl border border-red-300/20 bg-red-300/10 p-3 text-sm text-red-100">{error}</p>}
           {message && <p role="status" className="rounded-xl border border-ember/20 bg-ember/10 p-3 text-sm text-ember">{message}</p>}
           <button disabled={loading} className="h-12 w-full rounded-xl bg-ember font-extrabold text-ink transition hover:brightness-110 disabled:cursor-wait disabled:opacity-60">{loading ? "Please wait..." : mode === "login" ? "Sign in" : "Register"}</button>
@@ -93,6 +93,6 @@ export default function AuthForm({ nextPath, configError, oauthError, oauthMessa
           {mode === "login" ? "New to 4PLEX? Create an account" : "Already have an account? Sign in"}
         </button>
       </section>
-    </main>
+    </div>
   );
 }

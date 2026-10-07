@@ -3,6 +3,7 @@ import type { RecommendationEvent, RecommendationPreferences, RecommendationResu
 
 export const RECOMMENDATION_EVENTS_KEY = "4plex:recommendation-events";
 export const RECOMMENDATION_PREFS_KEY = "4plex:recommendation-preferences";
+export const MY_LIST_KEY = "4plex:list";
 
 export const GENRE_NAMES: Record<number, string> = {
   12: "Adventure", 14: "Fantasy", 16: "Animation", 18: "Drama", 27: "Horror", 28: "Action",
@@ -69,7 +70,7 @@ export const scheduleRecordEvent = (event: Omit<RecommendationEvent, "id" | "wat
   }
 };
 
-const recencyWeight = (watchedAt: string) => Math.exp(-Math.max(0, Date.now() - Date.parse(watchedAt)) / (1000 * 60 * 60 * 24 * 45));
+const recencyWeight = (watchedAt: string, now = Date.now()) => Math.exp(-Math.max(0, now - Date.parse(watchedAt)) / (1000 * 60 * 60 * 24 * 45));
 const mediaKey = (media: Pick<Media, "type" | "id">) => `${media.type}-${media.id}`;
 
 export const uniqueMedia = (items: Media[]) => {
@@ -103,31 +104,78 @@ export const genreProfile = (events: RecommendationEvent[], period?: WatchPeriod
 
 export const scoreRecommendations = (candidates: Media[], events: RecommendationEvent[], preferences: RecommendationPreferences, now = new Date()): RecommendationResult[] => {
   if (!preferences.enabled) return [];
+  const nowMs = now.getTime();
   const period = getPeriod(now, preferences.timezone);
   const global = genreProfile(events);
   const timed = genreProfile(events, period);
-  const recentIds = new Set(events.filter((event) => event.contentId && Date.now() - Date.parse(event.watchedAt) < 1000 * 60 * 60 * 24 * 14).map((event) => `${event.contentType}-${event.contentId}`));
+  const watchedEvents = events.filter((event) => event.contentId && event.contentType && event.type.startsWith("watch"));
+  const watchedIds = new Set(watchedEvents.map((event) => `${event.contentType}-${event.contentId}`));
+  const recentEvents = watchedEvents.filter((event) => nowMs - Date.parse(event.watchedAt) < 1000 * 60 * 60 * 24 * 45);
+  const recentGenres = new Set(recentEvents.flatMap((event) => event.genreIds ?? []));
+  const listIds = new Set<string>();
+  if (typeof window !== "undefined") {
+    try {
+      const saved: unknown = JSON.parse(localStorage.getItem(MY_LIST_KEY) ?? "[]");
+      if (Array.isArray(saved)) saved.forEach((item) => {
+        if (item && typeof item === "object" && "id" in item && "type" in item) {
+          listIds.add(`${String(item.type)}-${String(item.id)}`);
+        }
+      });
+    } catch { /* Recommendations still work without local list data. */ }
+  }
+  const searchTerms = events.filter((event) => event.type === "search" && event.query).map((event) => event.query!.toLowerCase().trim()).filter(Boolean);
+  const favoriteGenres = new Set(preferences.favoriteGenreIds);
   const ranked = uniqueMedia(candidates)
-    .filter((candidate) => !recentIds.has(mediaKey(candidate)))
+    .filter((candidate) => !watchedIds.has(mediaKey(candidate)))
     .map((candidate) => {
-      const genreScores = candidate.genreIds.map((id) => ({ timed: timed[id] ?? 0, global: global[id] ?? 0 }));
-      const timedScore = genreScores.reduce((sum, score) => sum + score.timed, 0) / Math.max(genreScores.length, 1);
-      const globalScore = genreScores.reduce((sum, score) => sum + score.global, 0) / Math.max(genreScores.length, 1);
-      const favoriteScore = candidate.genreIds.some((id) => preferences.favoriteGenreIds.includes(id)) ? 25 : 0;
-      return { candidate, score: timedScore * 0.5 + globalScore * 0.25 + favoriteScore + candidate.rating * 2 };
-    }).sort((a, b) => b.score - a.score);
+      const matchingGenres = candidate.genreIds.filter((id) => recentGenres.has(id)).length;
+      const genreScore = Math.min(1, (candidate.genreIds.reduce((sum, id) => sum + (global[id] ?? 0), 0) / Math.max(candidate.genreIds.length, 1)) / 100);
+      const recentScore = Math.min(1, matchingGenres / Math.max(candidate.genreIds.length, 1));
+      const similarScore = candidate.genreIds.some((id) => recentGenres.has(id)) ? 1 : 0;
+      const listScore = candidate.genreIds.some((id) => favoriteGenres.has(id)) || listIds.has(mediaKey(candidate)) ? 1 : 0;
+      const searchScore = searchTerms.some((term) => candidate.title.toLowerCase().includes(term)) ? 1 : 0;
+      const qualityScore = Math.min(1, Math.max(0, candidate.rating) / 10);
+      const timedScore = candidate.genreIds.reduce((sum, id) => sum + (timed[id] ?? 0), 0) / Math.max(candidate.genreIds.length, 1) / 100;
+      return {
+        candidate,
+        score: genreScore * 0.4 + (recentScore * 0.7 + timedScore * 0.3) * 0.25 + similarScore * 0.2 + listScore * 0.15 + searchScore * 0.1 + qualityScore * 0.05,
+        recentScore,
+        similarScore,
+        listScore,
+      };
+    })
+    .sort((a, b) => b.score - a.score);
+  const diversify = (items: typeof ranked, limit = 7) => {
+    const selected: typeof ranked = [];
+    const seenGenres = new Set<number>();
+    for (const item of items) {
+      const freshGenre = item.candidate.genreIds.some((id) => !seenGenres.has(id));
+      if (freshGenre || selected.length < 2) {
+        selected.push(item);
+        item.candidate.genreIds.forEach((id) => seenGenres.add(id));
+      }
+      if (selected.length === limit) break;
+    }
+    return selected.map(({ candidate }) => candidate);
+  };
+  const used = new Set<string>();
+  const takeFresh = (items: typeof ranked) => diversify(items).filter((candidate) => {
+    const key = mediaKey(candidate);
+    if (used.has(key)) return false;
+    used.add(key);
+    return true;
+  });
   const topGenre = Object.entries(timed).sort((a, b) => Number(b[1]) - Number(a[1]))[0];
   const genre = topGenre ? GENRE_NAMES[Number(topGenre[0])] ?? "favorites" : "favorites";
   const periodNames = { morning: "Morning", afternoon: "Afternoon", evening: "Evening", night: "Late-Night" };
-  const first = ranked.slice(0, 7).map(({ candidate }) => candidate);
-  if (!first.length) return [];
-  const firstKeys = new Set(first.map(mediaKey));
-  const second = ranked
-    .map(({ candidate }) => candidate)
-    .filter((candidate) => !firstKeys.has(mediaKey(candidate)))
-    .slice(0, 7);
-  return [
-    { title: topGenre ? `Your ${periodNames[period]} ${genre} Picks` : `Perfect for Your ${periodNames[period]}`, reason: topGenre ? `You often watch ${genre.toLowerCase()} around this time.` : "Popular, highly rated picks for your current watch window.", items: first },
-    ...(second.length ? [{ title: "Because You Watch These", reason: "Matched with your recent viewing patterns.", items: second }] : []),
-  ];
+  const sections: RecommendationResult[] = [];
+  const because = takeFresh(ranked.filter((item) => item.similarScore > 0));
+  const favorites = takeFresh(ranked.filter((item) => item.listScore > 0));
+  const recent = takeFresh(ranked.filter((item) => item.recentScore > 0));
+  const general = takeFresh(ranked);
+  if (because.length) sections.push({ title: "Because You Watched...", reason: "Titles that match the genres in your recent viewing.", items: because });
+  if (favorites.length) sections.push({ title: "Based On Your Favorites", reason: "Picks shaped by your saved preferences and My List.", items: favorites });
+  if (recent.length) sections.push({ title: "Recommended For You", reason: topGenre ? `More ${genre.toLowerCase()} picks for your watch habits.` : "Popular picks matched to your viewing activity.", items: recent });
+  if (general.length && !sections.length) sections.push({ title: "Trending For You", reason: "Popular and highly rated titles while you build your profile.", items: general });
+  return sections.slice(0, 3);
 };

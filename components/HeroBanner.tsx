@@ -15,7 +15,7 @@ export default function HeroBanner({ items }: { items: Media[] }) {
     <section aria-label="Featured" className="relative h-[72vh] min-h-[500px] w-full overflow-hidden">
       {items.map((m, idx) => (
         <div key={`${m.type}-${m.id}`} aria-hidden={idx !== i} className={`absolute inset-0 transition-opacity duration-1000 ${idx === i ? "opacity-100" : "pointer-events-none opacity-0"}`}>
-          <Image src={`https://image.tmdb.org/t/p/w1280${m.backdrop}`} alt="" fill priority={idx === 0} sizes="100vw" className={`object-cover object-top transition-transform duration-[12000ms] ease-out ${idx === i ? "scale-105" : "scale-100"}`} />
+          <Image src={`https://image.tmdb.org/t/p/w1280${m.backdrop}`} alt="" fill priority={idx === 0} quality={75} sizes="(max-width: 640px) 100vw, (max-width: 1280px) 100vw, 1536px" className={`object-cover object-top transition-transform duration-[12000ms] ease-out ${idx === i ? "scale-105" : "scale-100"}`} />
           <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/30 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 mx-auto max-w-[1500px] px-4 pb-20 md:px-10">
@@ -28,8 +28,8 @@ export default function HeroBanner({ items }: { items: Media[] }) {
               <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight md:text-6xl">{m.title}</h1>
               <p className="mt-4 line-clamp-3 text-base text-bone/80 md:text-lg">{m.overview}</p>
               <div className="mt-7 flex flex-wrap gap-3">
-                <Link href={`/watch/${m.type}/${m.id}`} className="motion-lift motion-glow rounded-lg bg-ember px-7 py-3 font-bold text-ink shadow-lg shadow-ember/20 transition hover:brightness-110">▶ Watch Now</Link>
-                <Link href={`/title/${m.type}/${m.id}`} className="motion-lift rounded-lg border border-white/15 bg-white/10 px-6 py-3 font-semibold backdrop-blur transition hover:bg-white/20">ⓘ More Info</Link>
+                <Link href={`/watch/${m.type}/${m.id}`} className="motion-lift motion-glow min-h-11 rounded-lg bg-ember px-6 py-3 font-bold text-ink shadow-lg shadow-ember/20 transition hover:brightness-110">▶ Watch Now</Link>
+                <Link href={`/title/${m.type}/${m.id}`} className="motion-lift min-h-11 rounded-lg border border-white/15 bg-white/10 px-5 py-3 font-semibold backdrop-blur transition hover:bg-white/20">ⓘ More Info</Link>
                 <AddToListButton media={m} />
               </div>
             </div>

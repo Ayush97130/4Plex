@@ -35,10 +35,10 @@ function Navbar() {
           </div>
         </nav>
       </header>
-      <nav aria-label="Mobile" className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-white/10 bg-ink/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden">
-        {[["Home", "/"], ["Browse", "/genres"], ["Search", "/search"], ["My List", "/my-list"]].map(([label, href]) => (
+      <nav aria-label="Mobile" className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-white/10 bg-ink/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(0,0,0,.2)] backdrop-blur-xl md:hidden">
+        {[["Home", "/"], ["Search", "/search"], ["Movies", "/movies"], ["TV", "/tv"], ["My List", "/my-list"]].map(([label, href]) => (
           <Link key={href} href={href} aria-current={path === href ? "page" : undefined}
-            className={`border-t-2 py-3 text-center text-xs font-semibold transition-colors ${path === href ? "border-ember text-ember" : "border-transparent text-mute hover:text-bone"}`}>{label}</Link>
+            className={`flex min-h-14 items-center justify-center border-t-2 px-1 text-center text-[11px] font-semibold transition-colors ${path === href ? "border-ember text-ember" : "border-transparent text-mute hover:text-bone"}`}>{label}</Link>
         ))}
       </nav>
     </>

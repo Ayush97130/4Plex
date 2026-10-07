@@ -60,7 +60,7 @@ export default function SearchClient({ recommendationPool, trending, popularMovi
       {!loading && !error && query.length > 0 && query.length < 2 && <p className="mt-8 text-mute">Enter at least 2 characters.</p>}
       {!loading && !error && query.length >= 2 && !results.length && <p className="mt-8 text-mute">No results found for “{query}”.</p>}
       {!!results.length && (
-        <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7">
+        <div className="mt-8 grid grid-cols-1 gap-x-4 gap-y-8 min-[360px]:grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7">
           {results.map((media) => <MediaCard key={`${media.type}-${media.id}`} m={media} />)}
         </div>
       )}

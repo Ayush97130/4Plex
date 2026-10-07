@@ -2,6 +2,7 @@
 import { useMyList } from "@/hooks/useMyList";
 import MediaCard from "@/components/MediaCard";
 import EmptyState from "@/components/EmptyState";
+import { MovieGridSkeleton } from "@/components/LoadingSkeletons";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,7 @@ export default function MyList() {
   return (
     <div className="mx-auto max-w-[1500px] px-4 pt-24 md:px-10">
       <h1 className="text-3xl font-extrabold">My List</h1>
+      {!ready && <div className="mt-8"><MovieGridSkeleton count={6} /></div>}
       {ready && !items.length && <EmptyState message="Your list is empty." hint="Tap + on any title to save it here." />}
       {sections.map(([t, list]) => list.length > 0 && (
         <section key={t} className="mt-8"><h2 className="mb-4 text-xl font-bold">{t}</h2>

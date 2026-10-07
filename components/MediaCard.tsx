@@ -10,7 +10,7 @@ export default function MediaCard({ m }: { m: Media }) {
     <article className="group relative w-36 shrink-0 sm:w-44 md:w-48">
       <Link href={`/title/${m.type}/${m.id}`} onClick={() => scheduleRecordEvent({ type: "open", contentId: m.id, contentType: m.type, genreIds: m.genreIds, title: m.title })} className="poster-card block overflow-hidden rounded-xl bg-raised shadow-md ring-1 ring-white/5 transition duration-300 group-hover:z-10 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-black/70 group-focus-within:ring-ember/60">
         <div className="relative aspect-[2/3]">
-          <Image src={img(m.poster)} alt={`${m.title} poster`} fill sizes="(max-width:640px) 144px, 192px" loading="lazy" className="object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+          <Image src={img(m.poster)} alt={`${m.title} poster`} fill sizes="(max-width:359px) 144px, (max-width:639px) 40vw, (max-width:767px) 176px, 192px" quality={75} loading="lazy" className="object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
           <div className="absolute inset-x-0 bottom-0 z-[1] flex translate-y-2 items-end justify-between p-3 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
             <span className="grid h-9 w-9 place-items-center rounded-full bg-ember font-bold text-ink shadow-lg">▶</span>
             <span className="rounded-md border border-white/20 bg-black/60 px-2 py-1 text-[10px] font-bold uppercase tracking-wider backdrop-blur">{m.type === "tv" ? "Series" : "Film"}</span>
