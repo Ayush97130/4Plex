@@ -7,14 +7,15 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isAuthRoute = pathname === "/auth" || pathname.startsWith("/auth/");
   const isPublicRoute = pathname === "/" || ["/movies", "/tv", "/trending", "/genres", "/search", "/about", "/contact", "/privacy", "/terms", "/sitemap.xml", "/robots.txt", "/api/contact", "/api/tmdb"].includes(pathname) || pathname.startsWith("/title/");
-  if (isAuthRoute || isPublicRoute) return response;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !key) {
+    if (isAuthRoute || isPublicRoute) return response;
     const loginUrl = new URL("/auth", request.url);
     loginUrl.searchParams.set("error", "config");
-    loginUrl.searchParams.set("next", `${request.nextUrl.pathname}${request.nextUrl.search}`);
+    const nextPath = getSafeNextPath(`${request.nextUrl.pathname}${request.nextUrl.search}`);
+    if (nextPath) loginUrl.searchParams.set("next", nextPath);
     return NextResponse.redirect(loginUrl);
   }
 
@@ -33,7 +34,7 @@ export async function middleware(request: NextRequest) {
   });
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
+  if (!user && !isAuthRoute && !isPublicRoute) {
     const loginUrl = new URL("/auth", request.url);
     const nextPath = getSafeNextPath(`${request.nextUrl.pathname}${request.nextUrl.search}`);
     if (nextPath) loginUrl.searchParams.set("next", nextPath);

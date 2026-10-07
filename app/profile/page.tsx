@@ -2,6 +2,7 @@ import ProfileSettings from "@/components/ProfileSettings";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Profile — 4PLEX", robots: { index: false, follow: false } };
+export const dynamic = "force-dynamic";
 
 export default function ProfilePage() {
   return (

@@ -45,7 +45,7 @@ export default function AccountMenu() {
         <Link href="/profile" aria-label={`Open profile for ${displayName}`} title={user?.email ?? displayName} className="grid h-9 w-9 place-items-center rounded-full font-bold text-ink shadow-lg transition-transform hover:scale-105" style={{ backgroundColor: profile.accent }}>
             {avatar.slice(0, 2)}
         </Link>
-        <button type="button" onClick={async () => { try { await createClient().auth.signOut(); } finally { window.location.assign("/auth"); } }} className="hidden rounded-full border border-white/15 bg-white/[.04] px-4 py-2 text-sm font-bold text-bone transition hover:border-ember/60 hover:text-ember sm:block">
+        <button type="button" onClick={async () => { try { await createClient().auth.signOut({ scope: "local" }); } finally { window.location.assign("/auth"); } }} className="hidden rounded-full border border-white/15 bg-white/[.04] px-4 py-2 text-sm font-bold text-bone transition hover:border-ember/60 hover:text-ember sm:block">
           Sign out
         </button>
     </div>

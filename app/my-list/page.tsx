@@ -2,6 +2,9 @@
 import { useMyList } from "@/hooks/useMyList";
 import MediaCard from "@/components/MediaCard";
 import EmptyState from "@/components/EmptyState";
+
+export const dynamic = "force-dynamic";
+
 export default function MyList() {
   const { items, ready } = useMyList();
   const sections = [["My Movies", items.filter((i) => i.type === "movie")], ["My TV Shows", items.filter((i) => i.type === "tv")]] as const;
