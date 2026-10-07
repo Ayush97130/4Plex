@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { pageMetadata, siteName } from "@/lib/seo";
+import { pageMetadata, siteName, siteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata("About 4PLEX", "Learn about 4PLEX, its discovery features, recommendations, and content sources.", "/about");
 
@@ -8,7 +8,7 @@ export default function AboutPage() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: siteName,
-    url: process.env.NEXT_PUBLIC_SITE_URL || "https://4plex.app",
+    url: siteUrl,
   };
   return (
     <article className="relative z-10 mx-auto max-w-4xl px-4 py-16 md:px-10">
