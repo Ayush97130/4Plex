@@ -1,4 +1,4 @@
-# 4PLEX
+# 4Plex
 1. `cp .env.example .env.local` and fill in `TMDB_API_KEY` (and later `NEXSTREAM_API_KEY`, `NEXSTREAM_BASE_URL`).
 2. `npm install && npm run dev`
 3. Playback: implement `services/nexstreamService.ts → getPlayback()` once Nexstream docs are available.
