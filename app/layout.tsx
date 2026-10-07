@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
 import AmbientBackground from "@/components/AmbientBackground";
 import { defaultDescription, siteName, siteUrl } from "@/lib/seo";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Navbar />
         <main className="flex-1 pb-20 md:pb-0">{children}</main>
         <Footer />
+        <SpeedInsights />
       </body>
     </html>
   );
