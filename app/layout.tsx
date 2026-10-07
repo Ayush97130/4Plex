@@ -5,15 +5,16 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
 import AmbientBackground from "@/components/AmbientBackground";
-import { defaultDescription, siteName, siteUrl } from "@/lib/seo";
+import { defaultDescription, siteName } from "@/lib/seo";
 
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: { default: `${siteName} — Movies & TV Shows`, template: `%s | ${siteName}` },
+  metadataBase: new URL("https://4-plex.vercel.app"),
+  title: { default: "4PLEX", template: "%s | 4PLEX" },
   description: defaultDescription,
   applicationName: siteName,
-  openGraph: { type: "website", siteName, title: `${siteName} — Movies & TV Shows`, description: defaultDescription, url: siteUrl },
+  alternates: { canonical: "/" },
+  openGraph: { type: "website", siteName, title: "4PLEX", description: defaultDescription, url: "https://4-plex.vercel.app/" },
   twitter: { card: "summary", title: `${siteName} — Movies & TV Shows`, description: defaultDescription },
   verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
 };
