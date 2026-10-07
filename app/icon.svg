@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title>4X</title>
+  <rect width="64" height="64" rx="14" fill="#121315"/>
+  <path d="M8 8h48v48H8z" fill="none" stroke="#E9A23B" stroke-width="2" opacity=".28"/>
+  <text x="32" y="42" fill="#E9A23B" font-family="Arial Black, Arial, sans-serif" font-size="29" font-weight="900" letter-spacing="-2" text-anchor="middle">4X</text>
+</svg>
