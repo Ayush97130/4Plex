@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import AuthForm from "@/components/AuthForm";
 import { createClient } from "@/lib/supabase/server";
+import { getSafeNextPath } from "@/lib/auth/redirect";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,7 @@ export default async function AuthPage({ searchParams }: { searchParams: { next?
     authenticated = false;
   }
 
-  if (authenticated) redirect("/");
+  if (authenticated) redirect(getSafeNextPath(searchParams.next) ?? "/");
 
-  return <AuthForm nextPath={searchParams.next} configError={searchParams.error === "config"} oauthError={searchParams.error === "oauth"} oauthMessage={searchParams.message} />;
+  return <AuthForm nextPath={getSafeNextPath(searchParams.next)} configError={searchParams.error === "config"} oauthError={searchParams.error === "oauth"} oauthMessage={searchParams.message} />;
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { getSupabaseConfig } from "@/lib/supabase/config";
+import { getSafeNextPath } from "@/lib/auth/redirect";
 
 export default function AuthForm({ nextPath, configError, oauthError, oauthMessage }: { nextPath?: string; configError?: boolean; oauthError?: boolean; oauthMessage?: string }) {
   const [mode, setMode] = useState<"login" | "register">("login");
@@ -30,7 +31,7 @@ export default function AuthForm({ nextPath, configError, oauthError, oauthMessa
       if (mode === "register" && !result.data.session) {
         setMessage("Account created. Check your email to confirm your address, then sign in.");
       } else {
-        window.location.assign(nextPath?.startsWith("/") ? nextPath : "/");
+        window.location.assign(getSafeNextPath(nextPath) ?? "/");
       }
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Authentication failed. Please try again.");
@@ -47,7 +48,8 @@ export default function AuthForm({ nextPath, configError, oauthError, oauthMessa
       const supabase = createClient();
       const { key } = getSupabaseConfig();
       const callbackUrl = new URL("/auth/callback", window.location.origin);
-      if (nextPath?.startsWith("/")) callbackUrl.searchParams.set("next", nextPath);
+      const destination = getSafeNextPath(nextPath);
+      if (destination) callbackUrl.searchParams.set("next", destination);
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
